@@ -2,12 +2,34 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 
-// Generate 30 placeholder slots for images
-const imageSlots = Array.from({ length: 30 }, (_, i) => ({
-  id: i + 1,
-  // Placeholder - will be replaced with actual meeting photos
-  src: null,
-}));
+// 20 meeting images with size indicators (big = has smiles, small = neutral)
+const meetingImages = [
+  // Row 1 - mixed sizes
+  { id: 1, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/3-90xIp6I0kvDxmAMQx2chKesKXUKH9K.png", size: "big" },
+  { id: 2, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/8-bYRzzx7Y2G87mgzKxWrh7bdituuoLF.png", size: "small" },
+  { id: 3, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/20-V77l0jwmOvAvNUP1MLveCEDXWRTwoY.png", size: "big" },
+  { id: 4, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/14-bGvvFTiFdNXbCDKHFJsEK585n0CI3S.png", size: "small" },
+  // Row 2
+  { id: 5, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2-PO5OfMSiK3hsJOxiGE3oAxZYXlYt9F.png", size: "big" },
+  { id: 6, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/6-iJFLTvCc5htXKRwS9H2mIaVm5DJRFH.png", size: "small" },
+  { id: 7, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/18-EKqAE9B6tJBEOqz3l49gBmI2tt8KNO.png", size: "big" },
+  { id: 8, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1-jEk8H1aFPa2uZgSsp5DwclQrrBoq6o.png", size: "small" },
+  // Row 3
+  { id: 9, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/19-wizrE3900LXf9AZdow8R0by910wFif.png", size: "big" },
+  { id: 10, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/5-bdY2XEkfNT4HW9437abQ63AcDAz5DV.png", size: "small" },
+  { id: 11, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/11-hggyMK25BdsZWI0eNvGOQ46bi94x25.png", size: "big" },
+  { id: 12, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/9-AC7LaFxMhJo8MCm0zCv4EJRuXoIpQC.png", size: "small" },
+  // Row 4
+  { id: 13, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4-mwA9JuZtKrxUCG7U5eq7J8mpaYEixd.png", size: "big" },
+  { id: 14, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/16-wrs334vodSl8rBNd0ZPQUftJmyIZru.png", size: "small" },
+  { id: 15, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/17-mGFBkbqU58DuVrILg5rWgPEEoFcfqM.png", size: "big" },
+  { id: 16, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/15-GSvgiDI8yGw2kxzO7oFjkGJ4cudlBj.png", size: "small" },
+  // Row 5
+  { id: 17, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/12-PX0VLFCnT3TqsjxyTXB4LyXfNaEejj.png", size: "big" },
+  { id: 18, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/13-ve530mZt5SEnUalW89AC4t7cDqQfIi.png", size: "small" },
+  { id: 19, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/7-SIpMC3Js6dlNfGv8my32NHWo51A3TA.png", size: "big" },
+  { id: 20, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/10-sR3uqTrOLYXrA0ianyNkUcdUjI63G5.png", size: "small" },
+];
 
 export default function BuildMyStoryPage() {
   return (
@@ -25,36 +47,25 @@ export default function BuildMyStoryPage() {
           </Link>
         </div>
 
-        {/* Image Grid - 6 columns x 5 rows = 30 images */}
+        {/* Image Grid - varied sizes with CSS Grid */}
         <div className="w-full overflow-hidden">
-          <div className="grid grid-cols-5 md:grid-cols-6 lg:grid-cols-10 gap-1">
-            {imageSlots.map((slot) => (
+          <div className="grid grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-1">
+            {meetingImages.map((image) => (
               <div
-                key={slot.id}
-                className="aspect-[4/3] relative overflow-hidden bg-neutral-100 group"
+                key={image.id}
+                className={`relative overflow-hidden group ${
+                  image.size === "big" 
+                    ? "col-span-2 row-span-1 aspect-[16/10]" 
+                    : "col-span-1 row-span-1 aspect-[4/3]"
+                }`}
               >
-                {slot.src ? (
-                  <Image
-                    src={slot.src}
-                    alt={`Meeting photo ${slot.id}`}
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                ) : (
-                  // Placeholder with subtle gradient variations
-                  <div 
-                    className="w-full h-full flex items-center justify-center"
-                    style={{
-                      background: `linear-gradient(${135 + (slot.id * 12)}deg, 
-                        hsl(${(slot.id * 37) % 360}, 15%, 90%), 
-                        hsl(${(slot.id * 53) % 360}, 20%, 85%))`,
-                    }}
-                  >
-                    <span className="text-neutral-400 text-xs font-mono">
-                      {slot.id}
-                    </span>
-                  </div>
-                )}
+                <Image
+                  src={image.src}
+                  alt={`Meeting photo ${image.id}`}
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  sizes={image.size === "big" ? "(max-width: 768px) 33vw, 16vw" : "(max-width: 768px) 16vw, 8vw"}
+                />
               </div>
             ))}
           </div>
