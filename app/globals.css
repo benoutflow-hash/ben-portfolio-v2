@@ -103,3 +103,77 @@ body {
     transform: translateY(0);
   }
 }
+
+.meeting-row-shell {
+  position: relative;
+  overflow: hidden;
+  border-radius: 30px;
+  padding: 0.35rem 0;
+  cursor: grab;
+}
+
+.meeting-row-shell:active {
+  cursor: grabbing;
+}
+
+.meeting-row-track {
+  display: flex;
+  width: max-content;
+  align-items: center;
+  gap: 1.2rem;
+  animation-name: meetingMarquee;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+.meeting-row-shell:hover .meeting-row-track {
+  animation-play-state: paused;
+}
+
+.meeting-row-track-reverse {
+  animation-direction: reverse;
+}
+
+.meeting-row-track-paused {
+  animation-play-state: paused;
+}
+
+.meeting-card {
+  position: relative;
+  flex: 0 0 auto;
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.meeting-card:hover {
+  transform: scale(1.035);
+}
+
+.meeting-card-media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 24px;
+  border: 1px solid rgba(24, 24, 27, 0.08);
+  background: #f5f5f5;
+  box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+}
+
+@keyframes meetingMarquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-50% - 0.6rem));
+  }
+}
+
+@media (max-width: 768px) {
+  .meeting-row-track {
+    gap: 0.85rem;
+  }
+
+  .meeting-card-media {
+    border-radius: 18px;
+  }
+}

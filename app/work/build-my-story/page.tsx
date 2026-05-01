@@ -3,281 +3,369 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
-import { useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-// 20 meeting images with varied sizes - smiling ones are bigger
-// Sizes range from xs to xl with smiling faces getting larger sizes
-const meetingImages = [
-  // Row 1 - scattered across top
-  { id: 1, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4-mwA9JuZtKrxUCG7U5eq7J8mpaYEixd.png", size: "lg", isSmiling: true },
-  { id: 2, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/8-bYRzzx7Y2G87mgzKxWrh7bdituuoLF.png", size: "sm", isSmiling: false },
-  { id: 3, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2-PO5OfMSiK3hsJOxiGE3oAxZYXlYt9F.png", size: "xl", isSmiling: true },
-  { id: 4, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/14-bGvvFTiFdNXbCDKHFJsEK585n0CI3S.png", size: "xs", isSmiling: false },
-  { id: 5, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/19-wizrE3900LXf9AZdow8R0by910wFif.png", size: "lg", isSmiling: true },
-  { id: 6, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/6-iJFLTvCc5htXKRwS9H2mIaVm5DJRFH.png", size: "md", isSmiling: false },
-  { id: 7, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/18-EKqAE9B6tJBEOqz3l49gBmI2tt8KNO.png", size: "xl", isSmiling: true },
-  { id: 8, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1-jEk8H1aFPa2uZgSsp5DwclQrrBoq6o.png", size: "sm", isSmiling: false },
-  { id: 9, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/11-hggyMK25BdsZWI0eNvGOQ46bi94x25.png", size: "lg", isSmiling: true },
-  { id: 10, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/9-AC7LaFxMhJo8MCm0zCv4EJRuXoIpQC.png", size: "xs", isSmiling: false },
-  { id: 11, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/17-mGFBkbqU58DuVrILg5rWgPEEoFcfqM.png", size: "xl", isSmiling: true },
-  { id: 12, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/5-bdY2XEkfNT4HW9437abQ63AcDAz5DV.png", size: "sm", isSmiling: false },
-  { id: 13, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/13-ve530mZt5SEnUalW89AC4t7cDqQfIi.png", size: "md", isSmiling: true },
-  { id: 14, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/3-90xIp6I0kvDxmAMQx2chKesKXUKH9K.png", size: "lg", isSmiling: true },
-  { id: 15, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/16-wrs334vodSl8rBNd0ZPQUftJmyIZru.png", size: "xs", isSmiling: false },
-  { id: 16, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/20-V77l0jwmOvAvNUP1MLveCEDXWRTwoY.png", size: "xl", isSmiling: true },
-  { id: 17, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/15-GSvgiDI8yGw2kxzO7oFjkGJ4cudlBj.png", size: "sm", isSmiling: false },
-  { id: 18, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/7-SIpMC3Js6dlNfGv8my32NHWo51A3TA.png", size: "lg", isSmiling: true },
-  { id: 19, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/10-sR3uqTrOLYXrA0ianyNkUcdUjI63G5.png", size: "md", isSmiling: true },
-  { id: 20, src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/12-PX0VLFCnT3TqsjxyTXB4LyXfNaEejj.png", size: "sm", isSmiling: true },
-];
-
-// Size classes with pixel widths for the horizontal scroll
-const sizeStyles: Record<string, { width: number; height: number }> = {
-  xl: { width: 280, height: 180 },
-  lg: { width: 220, height: 140 },
-  md: { width: 160, height: 100 },
-  sm: { width: 120, height: 80 },
-  xs: { width: 90, height: 60 },
+type MeetingImage = {
+  id: number;
+  src: string;
+  alt: string;
 };
 
+const meetingImages: MeetingImage[] = [
+  {
+    id: 1,
+    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4-mwA9JuZtKrxUCG7U5eq7J8mpaYEixd.png",
+    alt: "Build My Story meeting moment 1",
+  },
+  {
+    id: 2,
+    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/8-bYRzzx7Y2G87mgzKxWrh7bdituuoLF.png",
+    alt: "Build My Story meeting moment 2",
+  },
+  {
+    id: 3,
+    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2-PO5OfMSiK3hsJOxiGE3oAxZYXlYt9F.png",
+    alt: "Build My Story meeting moment 3",
+  },
+  {
+    id: 4,
+    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/14-bGvvFTiFdNXbCDKHFJsEK585n0CI3S.png",
+    alt: "Build My Story meeting moment 4",
+  },
+  {
+    id: 5,
+    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/19-wizrE3900LXf9AZdow8R0by910wFif.png",
+    alt: "Build My Story meeting moment 5",
+  },
+  {
+    id: 6,
+    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/6-iJFLTvCc5htXKRwS9H2mIaVm5DJRFH.png",
+    alt: "Build My Story meeting moment 6",
+  },
+  {
+    id: 7,
+    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/18-EKqAE9B6tJBEOqz3l49gBmI2tt8KNO.png",
+    alt: "Build My Story meeting moment 7",
+  },
+  {
+    id: 8,
+    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1-jEk8H1aFPa2uZgSsp5DwclQrrBoq6o.png",
+    alt: "Build My Story meeting moment 8",
+  },
+  {
+    id: 9,
+    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/11-hggyMK25BdsZWI0eNvGOQ46bi94x25.png",
+    alt: "Build My Story meeting moment 9",
+  },
+  {
+    id: 10,
+    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/9-AC7LaFxMhJo8MCm0zCv4EJRuXoIpQC.png",
+    alt: "Build My Story meeting moment 10",
+  },
+  {
+    id: 11,
+    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/17-mGFBkbqU58DuVrILg5rWgPEEoFcfqM.png",
+    alt: "Build My Story meeting moment 11",
+  },
+  {
+    id: 12,
+    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/5-bdY2XEkfNT4HW9437abQ63AcDAz5DV.png",
+    alt: "Build My Story meeting moment 12",
+  },
+  {
+    id: 13,
+    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/13-ve530mZt5SEnUalW89AC4t7cDqQfIi.png",
+    alt: "Build My Story meeting moment 13",
+  },
+  {
+    id: 14,
+    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/3-90xIp6I0kvDxmAMQx2chKesKXUKH9K.png",
+    alt: "Build My Story meeting moment 14",
+  },
+  {
+    id: 15,
+    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/16-wrs334vodSl8rBNd0ZPQUftJmyIZru.png",
+    alt: "Build My Story meeting moment 15",
+  },
+  {
+    id: 16,
+    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/20-V77l0jwmOvAvNUP1MLveCEDXWRTwoY.png",
+    alt: "Build My Story meeting moment 16",
+  },
+  {
+    id: 17,
+    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/15-GSvgiDI8yGw2kxzO7oFjkGJ4cudlBj.png",
+    alt: "Build My Story meeting moment 17",
+  },
+  {
+    id: 18,
+    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/7-SIpMC3Js6dlNfGv8my32NHWo51A3TA.png",
+    alt: "Build My Story meeting moment 18",
+  },
+  {
+    id: 19,
+    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/10-sR3uqTrOLYXrA0ianyNkUcdUjI63G5.png",
+    alt: "Build My Story meeting moment 19",
+  },
+  {
+    id: 20,
+    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/12-PX0VLFCnT3TqsjxyTXB4LyXfNaEejj.png",
+    alt: "Build My Story meeting moment 20",
+  },
+];
+
+const rowLayouts = [
+  ["sm", "md", "sm", "lg", "md"],
+  ["lg", "sm", "md", "sm", "lg"],
+  ["md", "lg", "sm", "md", "sm"],
+] as const;
+
+const sizeClassMap = {
+  sm: "w-[180px] md:w-[210px]",
+  md: "w-[230px] md:w-[280px]",
+  lg: "w-[290px] md:w-[360px]",
+};
+
+function MeetingRow({
+  title,
+  images,
+  reverse = false,
+  speed = 42,
+}: {
+  title: string;
+  images: MeetingImage[];
+  reverse?: boolean;
+  speed?: number;
+}) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
+  const dragState = useRef({
+    startX: 0,
+    startOffset: 0,
+  });
+
+  const repeatedImages = useMemo(() => [...images, ...images], [images]);
+
+  const startDrag = (clientX: number) => {
+    setIsDragging(true);
+    dragState.current = {
+      startX: clientX,
+      startOffset: dragOffset,
+    };
+  };
+
+  const updateDrag = (clientX: number) => {
+    if (!isDragging) return;
+
+    const delta = clientX - dragState.current.startX;
+    setDragOffset(dragState.current.startOffset + delta);
+  };
+
+  const stopDrag = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    const handlePointerUp = () => stopDrag();
+    const handleMouseMove = (event: MouseEvent) => updateDrag(event.clientX);
+    const handleTouchMove = (event: TouchEvent) => {
+      updateDrag(event.touches[0]?.clientX ?? 0);
+    };
+
+    window.addEventListener("mouseup", handlePointerUp);
+    window.addEventListener("touchend", handlePointerUp);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+
+    return () => {
+      window.removeEventListener("mouseup", handlePointerUp);
+      window.removeEventListener("touchend", handlePointerUp);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("touchmove", handleTouchMove);
+    };
+  }, [isDragging, dragOffset]);
+
+  return (
+    <div className="meeting-row-group">
+      <p className="mb-4 text-[0.72rem] uppercase tracking-[0.3em] text-neutral-400">
+        {title}
+      </p>
+      <div
+        className="meeting-row-shell"
+        onMouseDown={(event) => startDrag(event.clientX)}
+        onTouchStart={(event) => startDrag(event.touches[0]?.clientX ?? 0)}
+      >
+        <div
+          ref={trackRef}
+          className={`meeting-row-track ${reverse ? "meeting-row-track-reverse" : ""} ${
+            isDragging ? "meeting-row-track-paused" : ""
+          }`}
+          style={{
+            animationDuration: `${speed}s`,
+            transform: `translateX(${dragOffset}px)`,
+          }}
+        >
+          {repeatedImages.map((image, index) => {
+            const size = rowLayouts[index % rowLayouts.length][index % 5];
+
+            return (
+              <article
+                key={`${image.id}-${index}`}
+                className={`meeting-card ${sizeClassMap[size]}`}
+              >
+                <div className="meeting-card-media">
+                  <Image
+                    src={image.src}
+                    alt={image.alt}
+                    fill
+                    sizes="(max-width: 768px) 240px, 360px"
+                    className="object-cover"
+                  />
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function BuildMyStoryPage() {
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const rows = useMemo(
+    () => [
+      meetingImages.slice(0, 5),
+      meetingImages.slice(5, 10),
+      meetingImages.slice(10, 15),
+      meetingImages.slice(15, 20),
+    ],
+    [],
+  );
 
   return (
     <main className="min-h-screen bg-background text-foreground">
-      {/* Full-width Image Collage Section - White background */}
-      <section className="w-full bg-white pt-20">
-        {/* Back button */}
-        <div className="px-6 lg:px-8 mb-6">
+      <section className="relative overflow-hidden bg-[linear-gradient(180deg,#ffffff_0%,#fcfcfc_52%,#f7f7f7_100%)] pt-20 pb-12">
+        <div className="px-6 lg:px-8 mb-8">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-neutral-500 hover:text-neutral-900 transition-colors"
+            className="inline-flex items-center gap-2 text-neutral-500 transition-colors hover:text-neutral-900"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="h-4 w-4" />
             Back to Home
           </Link>
         </div>
 
-        {/* Image Collage - Horizontal scroll with scattered layout */}
-        <div 
-          ref={scrollRef}
-          className="relative w-full h-[400px] overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          <div className="absolute inset-0 flex items-center" style={{ width: '2400px' }}>
-            {/* Left cluster */}
-            <div className="absolute" style={{ left: '20px', top: '30px' }}>
-              <div className="rounded-xl overflow-hidden shadow-md" style={{ width: sizeStyles.lg.width, height: sizeStyles.lg.height }}>
-                <Image src={meetingImages[0].src} alt="" fill className="object-cover" sizes="280px" />
-              </div>
-            </div>
-            <div className="absolute" style={{ left: '40px', top: '200px' }}>
-              <div className="rounded-xl overflow-hidden shadow-md" style={{ width: sizeStyles.sm.width, height: sizeStyles.sm.height }}>
-                <Image src={meetingImages[1].src} alt="" fill className="object-cover" sizes="120px" />
-              </div>
-            </div>
-            <div className="absolute" style={{ left: '180px', top: '120px' }}>
-              <div className="rounded-xl overflow-hidden shadow-md" style={{ width: sizeStyles.xs.width, height: sizeStyles.xs.height }}>
-                <Image src={meetingImages[3].src} alt="" fill className="object-cover" sizes="90px" />
-              </div>
-            </div>
-            <div className="absolute" style={{ left: '260px', top: '20px' }}>
-              <div className="rounded-xl overflow-hidden shadow-md" style={{ width: sizeStyles.xl.width, height: sizeStyles.xl.height }}>
-                <Image src={meetingImages[2].src} alt="" fill className="object-cover" sizes="280px" />
-              </div>
-            </div>
-            <div className="absolute" style={{ left: '300px', top: '220px' }}>
-              <div className="rounded-xl overflow-hidden shadow-md" style={{ width: sizeStyles.md.width, height: sizeStyles.md.height }}>
-                <Image src={meetingImages[5].src} alt="" fill className="object-cover" sizes="160px" />
-              </div>
-            </div>
-            
-            {/* Center cluster with text */}
-            <div className="absolute" style={{ left: '520px', top: '40px' }}>
-              <div className="rounded-xl overflow-hidden shadow-md" style={{ width: sizeStyles.lg.width, height: sizeStyles.lg.height }}>
-                <Image src={meetingImages[4].src} alt="" fill className="object-cover" sizes="220px" />
-              </div>
-            </div>
-            <div className="absolute" style={{ left: '560px', top: '200px' }}>
-              <div className="rounded-xl overflow-hidden shadow-md" style={{ width: sizeStyles.sm.width, height: sizeStyles.sm.height }}>
-                <Image src={meetingImages[7].src} alt="" fill className="object-cover" sizes="120px" />
-              </div>
-            </div>
-            <div className="absolute" style={{ left: '760px', top: '100px' }}>
-              <div className="rounded-xl overflow-hidden shadow-md" style={{ width: sizeStyles.xs.width, height: sizeStyles.xs.height }}>
-                <Image src={meetingImages[9].src} alt="" fill className="object-cover" sizes="90px" />
-              </div>
-            </div>
-            
-            {/* Center text */}
-            <div className="absolute flex items-center justify-center" style={{ left: '880px', top: '80px', width: '320px', height: '240px' }}>
-              <h2 className="font-serif text-3xl md:text-4xl font-semibold text-neutral-900 text-center leading-tight">
-                Real Conversations<br />behind Real Outcomes
-              </h2>
-            </div>
-            
-            <div className="absolute" style={{ left: '780px', top: '20px' }}>
-              <div className="rounded-xl overflow-hidden shadow-md" style={{ width: sizeStyles.xl.width, height: sizeStyles.xl.height }}>
-                <Image src={meetingImages[6].src} alt="" fill className="object-cover" sizes="280px" />
-              </div>
-            </div>
-            <div className="absolute" style={{ left: '850px', top: '260px' }}>
-              <div className="rounded-xl overflow-hidden shadow-md" style={{ width: sizeStyles.md.width, height: sizeStyles.md.height }}>
-                <Image src={meetingImages[12].src} alt="" fill className="object-cover" sizes="160px" />
-              </div>
-            </div>
-            
-            {/* Right side cluster */}
-            <div className="absolute" style={{ left: '1200px', top: '30px' }}>
-              <div className="rounded-xl overflow-hidden shadow-md" style={{ width: sizeStyles.lg.width, height: sizeStyles.lg.height }}>
-                <Image src={meetingImages[8].src} alt="" fill className="object-cover" sizes="220px" />
-              </div>
-            </div>
-            <div className="absolute" style={{ left: '1220px', top: '200px' }}>
-              <div className="rounded-xl overflow-hidden shadow-md" style={{ width: sizeStyles.xl.width, height: sizeStyles.xl.height }}>
-                <Image src={meetingImages[10].src} alt="" fill className="object-cover" sizes="280px" />
-              </div>
-            </div>
-            <div className="absolute" style={{ left: '1440px', top: '60px' }}>
-              <div className="rounded-xl overflow-hidden shadow-md" style={{ width: sizeStyles.sm.width, height: sizeStyles.sm.height }}>
-                <Image src={meetingImages[11].src} alt="" fill className="object-cover" sizes="120px" />
-              </div>
-            </div>
-            <div className="absolute" style={{ left: '1500px', top: '180px' }}>
-              <div className="rounded-xl overflow-hidden shadow-md" style={{ width: sizeStyles.lg.width, height: sizeStyles.lg.height }}>
-                <Image src={meetingImages[13].src} alt="" fill className="object-cover" sizes="220px" />
-              </div>
-            </div>
-            <div className="absolute" style={{ left: '1580px', top: '20px' }}>
-              <div className="rounded-xl overflow-hidden shadow-md" style={{ width: sizeStyles.xs.width, height: sizeStyles.xs.height }}>
-                <Image src={meetingImages[14].src} alt="" fill className="object-cover" sizes="90px" />
-              </div>
-            </div>
-            
-            {/* Far right cluster */}
-            <div className="absolute" style={{ left: '1720px', top: '50px' }}>
-              <div className="rounded-xl overflow-hidden shadow-md" style={{ width: sizeStyles.xl.width, height: sizeStyles.xl.height }}>
-                <Image src={meetingImages[15].src} alt="" fill className="object-cover" sizes="280px" />
-              </div>
-            </div>
-            <div className="absolute" style={{ left: '1760px', top: '260px' }}>
-              <div className="rounded-xl overflow-hidden shadow-md" style={{ width: sizeStyles.sm.width, height: sizeStyles.sm.height }}>
-                <Image src={meetingImages[16].src} alt="" fill className="object-cover" sizes="120px" />
-              </div>
-            </div>
-            <div className="absolute" style={{ left: '1920px', top: '100px' }}>
-              <div className="rounded-xl overflow-hidden shadow-md" style={{ width: sizeStyles.lg.width, height: sizeStyles.lg.height }}>
-                <Image src={meetingImages[17].src} alt="" fill className="object-cover" sizes="220px" />
-              </div>
-            </div>
-            <div className="absolute" style={{ left: '2020px', top: '20px' }}>
-              <div className="rounded-xl overflow-hidden shadow-md" style={{ width: sizeStyles.md.width, height: sizeStyles.md.height }}>
-                <Image src={meetingImages[18].src} alt="" fill className="object-cover" sizes="160px" />
-              </div>
-            </div>
-            <div className="absolute" style={{ left: '2160px', top: '180px' }}>
-              <div className="rounded-xl overflow-hidden shadow-md" style={{ width: sizeStyles.sm.width, height: sizeStyles.sm.height }}>
-                <Image src={meetingImages[19].src} alt="" fill className="object-cover" sizes="120px" />
-              </div>
-            </div>
+        <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
+          <div className="mb-14 max-w-2xl px-2 md:px-4">
+            <p className="mb-4 text-[0.72rem] uppercase tracking-[0.32em] text-neutral-500">
+              Featured Case Study
+            </p>
+            <h1 className="font-serif text-4xl font-semibold tracking-[-0.04em] text-neutral-950 md:text-6xl">
+              Real Conversations behind Real Outcomes
+            </h1>
+            <p className="mt-6 max-w-xl text-base leading-8 text-neutral-600 md:text-lg">
+              A visual strip of the calls, moments, and operator work behind Build
+              My Story. Once the layout is approved, we can replace every image
+              with your final meeting screenshots.
+            </p>
+          </div>
+
+          <div className="space-y-7">
+            <MeetingRow title="Meetings, onboarding, customer delivery" images={rows[0]} speed={40} />
+            <MeetingRow title="Founder-side execution and real customer conversations" images={rows[1]} reverse speed={46} />
+            <MeetingRow title="Systems, support, and momentum across the week" images={rows[2]} speed={44} />
+            <MeetingRow title="Delivery moments worth showing in the room" images={rows[3]} reverse speed={50} />
           </div>
         </div>
-        
-        {/* Scroll hint */}
-        <p className="text-center text-sm text-neutral-400 py-4">Drag to explore</p>
+
+        <div className="px-6 pt-6 text-center text-sm text-neutral-400">
+          Hover to slow the flow. Drag any row to scrub through the gallery.
+        </div>
       </section>
 
-      {/* Key Statistics Section */}
-      <section className="w-full bg-white py-16 border-b border-neutral-200">
-        <div className="max-w-6xl mx-auto px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
-            {/* Stat 1 */}
-            <div className="text-center md:text-left">
-              <p className="text-5xl md:text-6xl font-semibold tracking-tight text-neutral-900 mb-3">
-                11%
-              </p>
-              <p className="text-base text-neutral-600 leading-relaxed">
-                Placeholder description text for this statistic. Add context about what this percentage represents.
-              </p>
-            </div>
+      <section className="w-full border-b border-neutral-200 bg-white py-16">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-12 px-6 md:grid-cols-3 md:gap-8 lg:px-8">
+          <div className="text-center md:text-left">
+            <p className="mb-3 text-5xl font-semibold tracking-tight text-neutral-900 md:text-6xl">
+              11%
+            </p>
+            <p className="text-base leading-relaxed text-neutral-600">
+              Placeholder description text for this statistic. Add context about what this percentage represents.
+            </p>
+          </div>
 
-            {/* Stat 2 */}
-            <div className="text-center md:text-left">
-              <p className="text-5xl md:text-6xl font-semibold tracking-tight text-neutral-900 mb-3">
-                $11,200
-              </p>
-              <p className="text-base text-neutral-600 leading-relaxed">
-                Placeholder description text for this statistic. Add context about what this dollar amount represents.
-              </p>
-            </div>
+          <div className="text-center md:text-left">
+            <p className="mb-3 text-5xl font-semibold tracking-tight text-neutral-900 md:text-6xl">
+              $11,200
+            </p>
+            <p className="text-base leading-relaxed text-neutral-600">
+              Placeholder description text for this statistic. Add context about what this dollar amount represents.
+            </p>
+          </div>
 
-            {/* Stat 3 */}
-            <div className="text-center md:text-left">
-              <p className="text-5xl md:text-6xl font-semibold tracking-tight text-neutral-900 mb-3">
-                847
-              </p>
-              <p className="text-base text-neutral-600 leading-relaxed">
-                Placeholder description text for this statistic. Add context about what this number represents.
-              </p>
-            </div>
+          <div className="text-center md:text-left">
+            <p className="mb-3 text-5xl font-semibold tracking-tight text-neutral-900 md:text-6xl">
+              847
+            </p>
+            <p className="text-base leading-relaxed text-neutral-600">
+              Placeholder description text for this statistic. Add context about what this number represents.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Header Content Section */}
-      <section className="py-20 px-6 lg:px-8 bg-white">
-        <div className="max-w-4xl mx-auto">
-          <p className="text-sm uppercase tracking-[0.28em] text-neutral-500 mb-4">
+      <section className="bg-white px-6 py-20 lg:px-8">
+        <div className="mx-auto max-w-4xl">
+          <p className="mb-4 text-sm uppercase tracking-[0.28em] text-neutral-500">
             Featured Case Study
           </p>
-          <h1 className="font-serif text-4xl md:text-5xl font-semibold tracking-[-0.04em] mb-8 text-neutral-900">
+          <h2 className="mb-8 font-serif text-4xl font-semibold tracking-[-0.04em] text-neutral-900 md:text-5xl">
             Build My Story
-          </h1>
-          <p className="text-lg text-neutral-600 leading-8 max-w-3xl">
+          </h2>
+          <p className="max-w-3xl text-lg leading-8 text-neutral-600">
             This is a portfolio page which will have a few images and text of me going through what I have done at Build My Story, which is the company I work at now.
           </p>
         </div>
       </section>
 
-      {/* Main Content Section */}
-      <section className="py-16 px-6 lg:px-8 bg-white">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="font-serif text-3xl font-semibold tracking-[-0.02em] mb-6 text-neutral-900">
+      <section className="bg-white px-6 py-16 lg:px-8">
+        <div className="mx-auto max-w-4xl">
+          <h2 className="mb-6 font-serif text-3xl font-semibold tracking-[-0.02em] text-neutral-900">
             Overview
           </h2>
-          <p className="text-base text-neutral-600 leading-8 mb-8">
+          <p className="mb-8 text-base leading-8 text-neutral-600">
             Placeholder text describing your role and responsibilities at Build My Story. This section can detail the company background, your position, and the overall scope of your work. Add information about the team, the mission, and your day-to-day contributions.
           </p>
 
-          <h2 className="font-serif text-3xl font-semibold tracking-[-0.02em] mb-6 text-neutral-900 mt-16">
+          <h2 className="mt-16 mb-6 font-serif text-3xl font-semibold tracking-[-0.02em] text-neutral-900">
             Key Responsibilities
           </h2>
-          <p className="text-base text-neutral-600 leading-8 mb-8">
+          <p className="mb-8 text-base leading-8 text-neutral-600">
             Placeholder text for your key responsibilities. Describe the main areas you focused on, the challenges you tackled, and the systems you built or improved. This could include sales processes, customer onboarding, CRM management, and cross-functional collaboration.
           </p>
 
-          <h2 className="font-serif text-3xl font-semibold tracking-[-0.02em] mb-6 text-neutral-900 mt-16">
-            Impact &amp; Results
+          <h2 className="mt-16 mb-6 font-serif text-3xl font-semibold tracking-[-0.02em] text-neutral-900">
+            Impact & Results
           </h2>
-          <p className="text-base text-neutral-600 leading-8 mb-8">
+          <p className="mb-8 text-base leading-8 text-neutral-600">
             Placeholder text for the impact and results of your work. Connect back to the statistics shown above and provide context for how these numbers were achieved. Include any notable wins, improvements, or milestones.
           </p>
         </div>
       </section>
 
-      {/* Footer Navigation */}
-      <section className="py-12 px-6 lg:px-8 bg-neutral-50 border-t border-neutral-200">
-        <div className="max-w-4xl mx-auto flex justify-between items-center">
+      <section className="border-t border-neutral-200 bg-neutral-50 px-6 py-12 lg:px-8">
+        <div className="mx-auto flex max-w-4xl items-center justify-between">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-neutral-600 hover:text-neutral-900 transition-colors"
+            className="inline-flex items-center gap-2 text-neutral-600 transition-colors hover:text-neutral-900"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="h-4 w-4" />
             Back to Home
           </Link>
           <Link
             href="/work/automation-systems"
-            className="text-neutral-600 hover:text-neutral-900 transition-colors"
+            className="text-neutral-600 transition-colors hover:text-neutral-900"
           >
             Next Project
           </Link>
